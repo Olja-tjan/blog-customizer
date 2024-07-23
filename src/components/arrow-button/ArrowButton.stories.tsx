@@ -15,7 +15,9 @@ export const ArrowButtonStory: Story = {
 			<>
 				<ArrowButton
 					isOpen={true}
-					onClickButton={() => console.log('clickButton')}
+					onClickButton={() =>
+						alert('клик на кнопку отображения/скрытия сайдбара')
+					}
 				/>
 			</>
 		);

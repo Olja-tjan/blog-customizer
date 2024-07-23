@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import clsx from 'clsx';
 
 import styles from './ArticleParamsForm.module.scss';
@@ -9,6 +9,8 @@ import { Select } from '../select';
 import { RadioGroup } from '../radio-group';
 import { Separator } from '../separator';
 
+import { useOutsideClickClose } from '../select/hooks/useOutsideClickClose';
+
 import {
 	fontFamilyOptions,
 	fontColors,
@@ -16,33 +18,65 @@ import {
 	contentWidthArr,
 	fontSizeOptions,
 	defaultArticleState,
+	ArticleStateType,
+	OptionType,
 } from '../../constants/articleProps';
 
-export const ArticleParamsForm = () => {
+type TArticleParamsForm = {
+	setArticleState: (state: ArticleStateType) => void;
+};
+
+export const ArticleParamsForm = ({ setArticleState }: TArticleParamsForm) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const [selected, setSelected] = useState(defaultArticleState);
+	const [selected, setSelected] =
+		useState<ArticleStateType>(defaultArticleState);
+	const rootRef = useRef<HTMLDivElement>(null);
+
+	useOutsideClickClose({
+		isOpen,
+		rootRef,
+		onChange: setIsOpen,
+	});
+
+	const handleChangeSelect = (
+		key: keyof ArticleStateType,
+		value: OptionType
+	) => {
+		setSelected({ ...selected, [key]: value });
+	};
+
+	const handleFormSubmit = (e: FormEvent) => {
+		e.preventDefault();
+		setArticleState(selected);
+	};
+
+	const handleFormReset = () => {
+		setArticleState(defaultArticleState);
+		setSelected(defaultArticleState);
+	};
 
 	return (
-		<>
+		<div ref={rootRef}>
 			<ArrowButton isOpen={isOpen} onClickButton={setIsOpen} />
 			<aside
 				className={clsx(styles.container, isOpen && styles.container_open)}>
-				<form className={styles.form}>
+				<form
+					className={styles.form}
+					onSubmit={handleFormSubmit}
+					onReset={handleFormReset}>
 					<Select
 						selected={selected.fontFamilyOption}
 						options={fontFamilyOptions}
-						//placeholder?={ string}
-						onChange={(e) => {
-							setSelected({ ...selected, fontFamilyOption: e });
+						onChange={(option: OptionType) => {
+							handleChangeSelect('fontFamilyOption', option);
 						}}
-						//onClose?={ () => void}
 						title='шрифт'
 					/>
 					<RadioGroup
 						selected={selected.fontSizeOption}
 						name='radio'
-						onChange={(e) => {
-							setSelected({ ...selected, fontSizeOption: e });
+						onChange={(option: OptionType) => {
+							handleChangeSelect('fontSizeOption', option);
 						}}
 						options={fontSizeOptions}
 						title='размер шрифта'
@@ -50,32 +84,26 @@ export const ArticleParamsForm = () => {
 					<Select
 						selected={selected.fontColor}
 						options={fontColors}
-						//placeholder?={ string}
-						onChange={(e) => {
-							setSelected({ ...selected, fontColor: e });
+						onChange={(option: OptionType) => {
+							handleChangeSelect('fontColor', option);
 						}}
-						//onClose?={ () => void}
 						title='цвет шрифта'
 					/>
 					<Separator />
 					<Select
 						selected={selected.backgroundColor}
 						options={backgroundColors}
-						//placeholder?={ string}
-						onChange={(e) => {
-							setSelected({ ...selected, backgroundColor: e });
+						onChange={(option: OptionType) => {
+							handleChangeSelect('backgroundColor', option);
 						}}
-						//onClose?={ () => void}
 						title='цвет фона'
 					/>
 					<Select
 						selected={selected.contentWidth}
 						options={contentWidthArr}
-						//placeholder?={ string}
-						onChange={(e) => {
-							setSelected({ ...selected, contentWidth: e });
+						onChange={(option: OptionType) => {
+							handleChangeSelect('contentWidth', option);
 						}}
-						//onClose?={ () => void}
 						title='ширина контекста'
 					/>
 					<div className={styles.bottomContainer}>
@@ -84,6 +112,6 @@ export const ArticleParamsForm = () => {
 					</div>
 				</form>
 			</aside>
-		</>
+		</div>
 	);
 };
