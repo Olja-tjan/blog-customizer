@@ -3,6 +3,7 @@ import clsx from 'clsx';
 
 import styles from './ArticleParamsForm.module.scss';
 
+import { Text } from '../text';
 import { ArrowButton } from '../arrow-button';
 import { Button } from '../button';
 import { Select } from '../select';
@@ -64,6 +65,9 @@ export const ArticleParamsForm = ({ setArticleState }: TArticleParamsForm) => {
 					className={styles.form}
 					onSubmit={handleFormSubmit}
 					onReset={handleFormReset}>
+					<Text as='h2' size={31} weight={800} uppercase>
+						Задайте параметры
+					</Text>
 					<Select
 						selected={selected.fontFamilyOption}
 						options={fontFamilyOptions}
